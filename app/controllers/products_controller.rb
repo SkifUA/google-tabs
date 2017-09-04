@@ -28,6 +28,7 @@ class ProductsController < ApplicationController
 
     respond_to do |format|
       if @product.save
+        send_data_to_sheets
         format.html { redirect_to @product, notice: 'Product was successfully created.' }
         format.json { render :show, status: :created, location: @product }
       else
@@ -42,6 +43,7 @@ class ProductsController < ApplicationController
   def update
     respond_to do |format|
       if @product.update(product_params)
+        send_data_to_sheets
         format.html { redirect_to @product, notice: 'Product was successfully updated.' }
         format.json { render :show, status: :ok, location: @product }
       else
@@ -56,9 +58,15 @@ class ProductsController < ApplicationController
   def destroy
     @product.destroy
     respond_to do |format|
+      send_data_to_sheets
       format.html { redirect_to products_url, notice: 'Product was successfully destroyed.' }
       format.json { head :no_content }
     end
+  end
+  
+  def update_sheets
+    send_data_to_sheets
+    redirect_to products_path
   end
 
   private
@@ -69,6 +77,12 @@ class ProductsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def product_params
-      params.require(:product).permit(:name, :quantity)
+      params.require(:product).permit(:name, :quantity, :description)
+    end
+
+    def send_data_to_sheets
+      products = Product.all
+      service = GoogleServiceSheets.new(current_user)
+      service.update_all(products)
     end
 end

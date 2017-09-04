@@ -68,7 +68,7 @@ class ProductsController < ApplicationController
   
   def update_sheets
     send_data_to_sheets
-    redirect_to products_path
+    redirect_to products_path, notice: 'Data in the Google table was updated.'
   end
 
   private

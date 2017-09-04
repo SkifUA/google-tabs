@@ -1,8 +1,8 @@
 class GoogleServiceSheets
   require 'google/apis/sheets_v4'
 
-  def initialize(user)
-    @spreadsheet_id = '1rRKvUfMveR5cggGzSc2hWn3KmQ96iTAvgTHtqqegOIY'
+  def initialize(user, sheets_id)
+    @spreadsheet_id = sheets_id
     @secrets = GoogleClientSecrets.secrets(user)
   end
 

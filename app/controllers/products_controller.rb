@@ -83,7 +83,7 @@ class ProductsController < ApplicationController
 
     def send_data_to_sheets
       products = Product.all
-      service = GoogleServiceSheets.new(current_user)
+      service = GoogleServiceSheets.new(current_user, ENV['SHEETS_PRODUCT_ID'])
       service.update_all(products)
     end
 end

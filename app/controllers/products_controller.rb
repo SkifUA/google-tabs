@@ -1,7 +1,7 @@
 class ProductsController < ApplicationController
   before_action :require_user
   before_action :set_product, only: [:show, :edit, :update, :destroy]
-  before_action :google_sheets_service, only: [:create, :update, :destroy]
+  before_action :google_sheets_service, only: [:create, :update]
 
   # GET /products
   # GET /products.json

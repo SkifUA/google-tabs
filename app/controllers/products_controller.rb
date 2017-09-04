@@ -1,6 +1,7 @@
 class ProductsController < ApplicationController
   before_action :require_user
   before_action :set_product, only: [:show, :edit, :update, :destroy]
+  before_action :google_sheets_service, only: [:create, :update, :destroy]
 
   # GET /products
   # GET /products.json
@@ -29,7 +30,7 @@ class ProductsController < ApplicationController
 
     respond_to do |format|
       if @product.save
-        send_data_to_sheets
+        @google_sheets.create(@product)
         format.html { redirect_to @product, notice: 'Product was successfully created.' }
         format.json { render :show, status: :created, location: @product }
       else
@@ -44,7 +45,7 @@ class ProductsController < ApplicationController
   def update
     respond_to do |format|
       if @product.update(product_params)
-        send_data_to_sheets
+        @google_sheets.update(@product)
         format.html { redirect_to @product, notice: 'Product was successfully updated.' }
         format.json { render :show, status: :ok, location: @product }
       else
@@ -83,7 +84,11 @@ class ProductsController < ApplicationController
 
     def send_data_to_sheets
       products = Product.all
-      service = GoogleServiceSheets.new(current_user, ENV['SHEETS_PRODUCT_ID'])
-      service.update_all(products)
+      google_sheets_service
+      @google_sheets.update_all(products)
+    end
+
+    def google_sheets_service
+      @google_sheets = GoogleServiceSheets.new(current_user, ENV['SHEETS_PRODUCT_ID'])
     end
 end

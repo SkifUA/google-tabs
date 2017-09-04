@@ -16,7 +16,58 @@ class GoogleServiceSheets
 
   def read(page, cells)
     range = "#{page}!#{cells}"
-    puts service.get_spreadsheet_values(@spreadsheet_id, range)
+    response = service.get_spreadsheet_values(@spreadsheet_id, range)
+    response.values
+  end
+
+  def number_row(column, id)
+    number = 0
+    column.each do |row|
+      number += 1
+      break if row.first == id.to_s
+    end
+    number
+  end
+
+  def update(object)
+    rows = read('products', 'A1:A')
+    updated_row = number_row(rows, object.id)
+
+    range = "products!A#{updated_row}:D#{updated_row}"
+    value_range_object = {
+        range: range,
+        major_dimension: "ROWS",
+        values: [row_for_sheets(object)]
+    }
+
+    service.update_spreadsheet_value(
+        @spreadsheet_id,
+        range,
+        value_range_object,
+        include_values_in_response: true,
+        value_input_option: 'USER_ENTERED'
+    )
+
+  end
+
+  def create(object)
+    rows = read('products', 'A1:A')
+    updated_row = rows.count + 1
+
+    range = "products!A#{updated_row}:D#{updated_row}"
+    value_range_object = {
+        range: range,
+        major_dimension: "ROWS",
+        values: [row_for_sheets(object)]
+    }
+
+    service.update_spreadsheet_value(
+        @spreadsheet_id,
+        range,
+        value_range_object,
+        include_values_in_response: true,
+        value_input_option: 'USER_ENTERED'
+    )
   end
 
   def update_all(objects)
@@ -37,9 +88,12 @@ class GoogleServiceSheets
         include_values_in_response: true,
         value_input_option: 'USER_ENTERED'
     )
-
     puts response.to_json
   end
+
+  # TODO added method for destroy row
+  # def destroy(object_id)
+  # end
 
   private
 
